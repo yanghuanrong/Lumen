@@ -1,0 +1,22 @@
+# 构建产物
+.build/
+build/
+.xcodebuild/
+DerivedData/
+
+# Xcode 工程（由 scripts/generate_xcodeproj.rb 生成）
+Lumen.xcodeproj/
+Lumen.xcworkspace/
+
+# 生成的图标
+Resources/AppIcon.icns
+Resources/AppIcon.iconset/
+
+# SwiftPM / Xcode 用户态
+.swiftpm/xcode/package.xcworkspace/xcuserdata/
+.swiftpm/xcode/xcuserdata/
+xcuserdata/
+*.xcuserstate
+
+# macOS
+.DS_Store
