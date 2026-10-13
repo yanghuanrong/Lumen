@@ -6,7 +6,8 @@ alwaysApply: true
 # Git 工作流
 
 - **禁止**向 `main` 直接 `git push`（含 force push）。
-- 所有改动：新建 `feature/*` / `fix/*` / `chore/*` 分支 → 推远程 → 开 PR。
-- 等待 CI 与 CodeRabbit 审查评论后再合并；不要在审查完成前擅自合并，除非用户明确要求。
-- 创建 PR 用 `gh pr create`；合并用 `gh pr merge`（需用户确认或审查通过后）。
+- 所有改动：新建 `feature/*` / `fix/*` / `chore/*` / `docs/*` 分支 → 推远程 → 开 PR。
+- 仓库已开 **Auto-merge**：CI `build` 绿灯后自动 squash 合并，无需人工点 Merge。
+- 创建 PR 后执行 `gh pr merge --auto --squash`（若 `enable-auto-merge` workflow 未触发）。
+- CodeRabbit 评论供参考；**不阻塞**合并（除非用户另行要求改分支保护）。
 - 不要修改 git config；不要跳过 hooks。
