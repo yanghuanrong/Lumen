@@ -1,0 +1,12 @@
+---
+description: Lumen 仓库禁止直推 main，必须走 PR + 审查
+alwaysApply: true
+---
+
+# Git 工作流
+
+- **禁止**向 `main` 直接 `git push`（含 force push）。
+- 所有改动：新建 `feature/*` / `fix/*` / `chore/*` 分支 → 推远程 → 开 PR。
+- 等待 CI 与 CodeRabbit 审查评论后再合并；不要在审查完成前擅自合并，除非用户明确要求。
+- 创建 PR 用 `gh pr create`；合并用 `gh pr merge`（需用户确认或审查通过后）。
+- 不要修改 git config；不要跳过 hooks。
