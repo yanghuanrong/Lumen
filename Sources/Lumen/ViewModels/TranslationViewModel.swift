@@ -65,12 +65,6 @@ final class TranslationViewModel: ObservableObject {
             return
         }
 
-        // 命中断板哨兵值说明没有新内容
-        if text == LumenStrings.monitorSentinel {
-            if !settings.keepLastInput { inputText = "" }
-            return
-        }
-
         // 避免重复翻译同样的内容
         if text != inputText {
             inputText = text

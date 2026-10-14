@@ -16,13 +16,4 @@ enum ClipboardService {
     static func currentText() -> String? {
         NSPasteboard.general.string(forType: .string)
     }
-
-    var isSentinelOnClipboard: Bool {
-        NSPasteboard.general.string(forType: .string) == LumenStrings.monitorSentinel
-    }
-}
-
-enum LumenStrings {
-    /// 剪贴板监听的哨兵值，用于识别"空内容"
-    static let monitorSentinel = "\u{200B}LUMEN_CLIPBOARD_WATCH\u{200B}"
 }
