@@ -128,6 +128,11 @@ struct SettingsView: View {
                     detail: "从菜单栏可快速打开与退出",
                     isOn: $settings.showMenuBarItem
                 )
+                toggle(
+                    "开机自动启动",
+                    detail: "登录 macOS 后自动运行 Lumen",
+                    isOn: $settings.launchAtLogin
+                )
             }
         }
     }

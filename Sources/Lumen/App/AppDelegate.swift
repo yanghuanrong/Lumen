@@ -1,5 +1,6 @@
 import AppKit
 import Combine
+import ServiceManagement
 import SwiftUI
 
 @MainActor
@@ -26,6 +27,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         registerHotKey()
         observeSettings()
         updateStatusItem()
+        syncLaunchAtLogin()
     }
 
     func applicationWillTerminate(_ notification: Notification) {
@@ -217,6 +219,41 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 }
             }
             .store(in: &cancellables)
+
+        settings.$launchAtLogin
+            .dropFirst()
+            .removeDuplicates()
+            .sink { [weak self] enabled in
+                self?.applyLaunchAtLogin(enabled)
+            }
+            .store(in: &cancellables)
+    }
+
+    // MARK: - 开机自启
+
+    /// 启动时以系统登录项实际状态为准修正设置（App 移动/重装会使注册失效）
+    private func syncLaunchAtLogin() {
+        settings.launchAtLogin = (SMAppService.mainApp.status == .enabled)
+    }
+
+    private func applyLaunchAtLogin(_ enabled: Bool) {
+        do {
+            if enabled {
+                if SMAppService.mainApp.status != .enabled {
+                    try SMAppService.mainApp.register()
+                }
+            } else if SMAppService.mainApp.status == .enabled {
+                try SMAppService.mainApp.unregister()
+            }
+        } catch {
+            // 注册/注销失败时回滚到系统实际状态，避免设置与事实不符
+            settings.launchAtLogin = (SMAppService.mainApp.status == .enabled)
+            let alert = NSAlert()
+            alert.messageText = "设置开机自启失败"
+            alert.informativeText = error.localizedDescription
+            alert.alertStyle = .warning
+            alert.runModal()
+        }
     }
 
     // MARK: - 菜单栏
