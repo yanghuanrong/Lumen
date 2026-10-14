@@ -1,4 +1,5 @@
 import AppKit
+import Carbon.HIToolbox
 import SwiftUI
 
 /// 快捷键录制控件：点击后按下组合键即可完成录制。
@@ -97,15 +98,19 @@ struct HotKeyRecorder: NSViewRepresentable {
             guard isRecording else { return super.keyDown(with: event) }
 
             let flags = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
-            // 必须带至少一个修饰键，避免与普通输入冲突
-            guard !flags.isEmpty else {
+
+            // ⇧ 不能单独作为修饰键，否则全局打不出大写字母
+            guard flags.contains(.command) || flags.contains(.option) || flags.contains(.control) else {
                 NSSound.beep()
+                label.stringValue = "需搭配 ⌘/⌥/⌃（⇧ 不能单独用）"
                 return
             }
-            // 只用 ⌘⇧ 之类的组合，避免占用功能键
-            guard [NSEvent.ModifierFlags.command, .option, .control, .shift]
-                    .contains(where: { flags.contains($0) }) else {
+
+            // 裸 ⌘（可含 ⇧）+ 字母/数字/空格/Tab 会全局抢占所有 App 的菜单快捷键（如 ⌘C 复制），禁止录制
+            let hasOptionOrControl = flags.contains(.option) || flags.contains(.control)
+            if flags.contains(.command) && !hasOptionOrControl && isPlainKey(event) {
                 NSSound.beep()
+                label.stringValue = "⌘+字母/数字易与其它 App 冲突，请加 ⌥/⌃"
                 return
             }
 
@@ -119,6 +124,16 @@ struct HotKeyRecorder: NSViewRepresentable {
             onHotKey?(key)
 
             window?.makeFirstResponder(nil)
+        }
+
+        /// 是否为字母 / 数字 / 空格 / Tab 这类几乎所有 App 都会用作菜单快捷键的键
+        private func isPlainKey(_ event: NSEvent) -> Bool {
+            if event.keyCode == UInt16(kVK_Space) || event.keyCode == UInt16(kVK_Tab) {
+                return true
+            }
+            guard let ch = event.charactersIgnoringModifiers, ch.count == 1,
+                  let scalar = ch.unicodeScalars.first else { return false }
+            return CharacterSet.alphanumerics.contains(scalar)
         }
     }
 }
