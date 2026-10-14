@@ -19,21 +19,22 @@ struct HotKey: Codable, Equatable, Hashable {
     /// 人类可读展示，如 "⌥D"
     var displayString: String {
         var s = ""
-        // NSEvent.ModifierFlags 的rawValue 已经是 Carbon 掩码左移 8 位的结果，
-        // 因此还原时左移回去。
-        let flags = NSEvent.ModifierFlags(rawValue: UInt(carbonModifiers) << 8)
-        if flags.contains(.control) { s += "⌃" }
-        if flags.contains(.option) { s += "⌥" }
-        if flags.contains(.shift) { s += "⇧" }
-        if flags.contains(.command) { s += "⌘" }
+        if carbonModifiers & UInt32(controlKey) != 0 { s += "⌃" }
+        if carbonModifiers & UInt32(optionKey) != 0 { s += "⌥" }
+        if carbonModifiers & UInt32(shiftKey) != 0 { s += "⇧" }
+        if carbonModifiers & UInt32(cmdKey) != 0 { s += "⌘" }
         s += Self.keyName(keyCode)
         return s
     }
 
     /// 把 NSEvent 修饰键转换为 Carbon 掩码
     static func carbonModifiers(from flags: NSEvent.ModifierFlags) -> UInt32 {
-        // NSEvent 的 rawValue 比 Carbon 掩码大 2^8，右移即得Carbon 值
-        UInt32(truncatingIfNeeded: flags.rawValue) >> 8
+        var carbon: UInt32 = 0
+        if flags.contains(.command) { carbon |= UInt32(cmdKey) }
+        if flags.contains(.option) { carbon |= UInt32(optionKey) }
+        if flags.contains(.control) { carbon |= UInt32(controlKey) }
+        if flags.contains(.shift) { carbon |= UInt32(shiftKey) }
+        return carbon
     }
 
     /// 从逆事件读出 NSEvent 修饰键（用于录制控件）
