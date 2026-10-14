@@ -86,8 +86,8 @@ struct MyMemoryEngine: TranslationEngine {
         return out.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
-    /// 按句子边界切分，避免破坏 UTF-8
-    private static func chunk(_ text: String, maxBytes: Int) -> [String] {
+    /// 按句子边界切分，避免破坏 UTF-8（GoogleEngine 长文本分块共用）
+    static func chunk(_ text: String, maxBytes: Int) -> [String] {
         if text.utf8.count <= maxBytes { return [text] }
 
         let separators = CharacterSet(charactersIn: "。！？.!?\n")
