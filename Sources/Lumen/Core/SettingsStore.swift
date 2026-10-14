@@ -121,16 +121,6 @@ final class SettingsStore: ObservableObject {
         didSet { defaults.set(showMenuBarItem, forKey: Keys.showMenuBar) }
     }
 
-    // OpenAI 兼容配置
-    @Published var openAIKey: String {
-        didSet { defaults.set(openAIKey, forKey: Keys.openAIKey) }
-    }
-    @Published var openAIBaseURL: String {
-        didSet { defaults.set(openAIBaseURL, forKey: Keys.openAIBase) }
-    }
-    @Published var openAIModel: String {
-        didSet { defaults.set(openAIModel, forKey: Keys.openAIModel) }
-    }
     @Published var myMemoryEmail: String {
         didSet { defaults.set(myMemoryEmail, forKey: Keys.myMemoryEmail) }
     }
@@ -147,9 +137,6 @@ final class SettingsStore: ObservableObject {
         static let keepInput = "keepLastInput"
         static let launchAtLogin = "launchAtLogin"
         static let showMenuBar = "showMenuBarItem"
-        static let openAIKey = "openai.key"
-        static let openAIBase = "openai.baseURL"
-        static let openAIModel = "openai.model"
         static let myMemoryEmail = "mymemory.email"
     }
 
@@ -174,17 +161,6 @@ final class SettingsStore: ObservableObject {
         launchAtLogin = defaults.bool(forKey: Keys.launchAtLogin)
         showMenuBarItem = defaults.object(forKey: Keys.showMenuBar) as? Bool ?? true
 
-        openAIKey = defaults.string(forKey: Keys.openAIKey) ?? ""
-        openAIBaseURL = defaults.string(forKey: Keys.openAIBase) ?? "https://api.openai.com/v1"
-        openAIModel = defaults.string(forKey: Keys.openAIModel) ?? "gpt-4o-mini"
         myMemoryEmail = defaults.string(forKey: Keys.myMemoryEmail) ?? ""
-    }
-
-    var openAIConfigured: Bool {
-        !openAIBaseURL.trimmingCharacters(in: .whitespaces).isEmpty
-            && !openAIModel.trimmingCharacters(in: .whitespaces).isEmpty
-            && (!openAIKey.trimmingCharacters(in: .whitespaces).isEmpty
-                || openAIBaseURL.contains("localhost")
-                || openAIBaseURL.contains("127.0.0.1"))
     }
 }

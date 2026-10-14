@@ -8,8 +8,8 @@ final class Translator: ObservableObject {
     enum EngineChoice: String, CaseIterable, Identifiable {
         case auto
         case youdao
+        case google
         case mymemory
-        case openai
 
         var id: String { rawValue }
 
@@ -17,8 +17,8 @@ final class Translator: ObservableObject {
             switch self {
             case .auto: return "自动（推荐）"
             case .youdao: return "有道词典"
+            case .google: return "谷歌翻译"
             case .mymemory: return "MyMemory"
-            case .openai: return "OpenAI 兼容"
             }
         }
 
@@ -26,8 +26,8 @@ final class Translator: ObservableObject {
             switch self {
             case .auto: return "单词走词典，整句走整句引擎，失败自动切换"
             case .youdao: return "免密钥 · 释义音标例句齐全"
+            case .google: return "免密钥 · 整句质量最好，需系统代理"
             case .mymemory: return "免密钥 · 长句翻译稳定"
-            case .openai: return "需配置密钥，质量最好，支持本地模型"
             }
         }
     }
@@ -168,40 +168,24 @@ final class Translator: ObservableObject {
         switch choice {
         case .youdao:
             return [YoudaoEngine()]
+        case .google:
+            return [GoogleEngine()]
         case .mymemory:
             return [MyMemoryEngine()]
-        case .openai:
-            return [makeOpenAIEngine()].compactMap { $0 }
         case .auto:
             var chain: [any TranslationEngine] = []
-            // 单词优先词典引擎，整句优先整句引擎
+            // 单词优先词典引擎；整句优先谷歌，MyMemory 兑底
             if isWord {
                 chain.append(YoudaoEngine())
+                chain.append(GoogleEngine())
                 chain.append(MyMemoryEngine())
             } else {
+                chain.append(GoogleEngine())
                 chain.append(MyMemoryEngine())
                 chain.append(YoudaoEngine())
-            }
-            if let openAI = makeOpenAIEngine() {
-                chain.append(openAI)
             }
             return chain
         }
-    }
-
-    private func makeOpenAIEngine() -> (any TranslationEngine)? {
-        let key = settings.openAIKey.trimmingCharacters(in: .whitespacesAndNewlines)
-        let base = settings.openAIBaseURL.trimmingCharacters(in: .whitespacesAndNewlines)
-        let model = settings.openAIModel.trimmingCharacters(in: .whitespacesAndNewlines)
-        // 用户填了任意一项才算启用
-        guard !key.isEmpty || !base.isEmpty else { return nil }
-        guard !base.isEmpty, !model.isEmpty else { return nil }
-
-        return OpenAICompatibleEngine(
-            apiKey: key,
-            baseURL: base,
-            model: model
-        )
     }
 
     /// 词典结果没有独立译文时，用释义拼一个可读的译文
