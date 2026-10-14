@@ -152,9 +152,14 @@ struct SettingsView: View {
 
     // MARK: - Footer
 
+    /// 从 Info.plist 读取版本号；swift run 等无 bundle 场景回退为 dev
+    private static var appVersion: String {
+        Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "dev"
+    }
+
     private var footer: some View {
         HStack {
-            Text("Lumen v0.1.0")
+            Text("Lumen v\(Self.appVersion)")
                 .font(.system(size: 10.5))
                 .foregroundStyle(.tertiary)
             Spacer()

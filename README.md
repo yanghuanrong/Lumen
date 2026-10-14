@@ -72,13 +72,26 @@ swift run Lumen --render "serendipity" /tmp/lumen-word.png
 ### 安装运行
 
 ```bash
+# 方式一：下载正式包（带版本号）
+# 打开 https://github.com/yanghuanrong/Lumen/releases 下载 Lumen-x.y.z.dmg
+# 挂载后把 Lumen 拖入 Applications
+
+# 方式二：本地构建
 ./build.sh
 open build/Lumen.app
 # 可选：cp -R build/Lumen.app /Applications/
 ```
 
 首次打开若被拦截：右键 → 打开，或  
-`xattr -d com.apple.quarantine /Applications/Lumen.app`
+`xattr -d com.apple.quarantine /Applications/Lumen.app`  
+（无开发者账号无法公证，从网上下载的包首次打开需手动放行）
+
+### 发布新版本
+
+1. 改 `build.sh` 里的 `VERSION` 默认值
+2. 合入 `main` 后打标签：`git tag v0.1.0 && git push origin v0.1.0`
+3. `release.yml` 自动构建 `Lumen-<版本>.dmg` 并创建 GitHub Release
+4. 下载页：`https://github.com/yanghuanrong/Lumen/releases`
 
 ### 日常使用
 
