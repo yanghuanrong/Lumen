@@ -30,7 +30,7 @@ Sources/Lumen/
   App/PanelRenderer.swift    # 离屏渲染 PNG
   ViewModels/TranslationViewModel.swift  # 呼出→翻译→复制；须转发 translator 变更
   Translate/Translator.swift # 选路、降级、缓存
-  Translate/YoudaoEngine.swift / MyMemoryEngine.swift / OpenAICompatibleEngine.swift
+  Translate/YoudaoEngine.swift / GoogleEngine.swift / MyMemoryEngine.swift
   HotKey/GlobalHotKeyManager.swift
   Window/FloatingPanel.swift
   Views/TranslationPanelView.swift / SettingsView.swift
@@ -42,9 +42,10 @@ Sources/Lumen/
 ### Behavior notes (easy to break)
 
 - UI 只观察 `TranslationViewModel`：`translator` 的 `@Published` 必须转发到 viewModel，否则会卡在「翻译中…」。
-- 单词走有道、整句走 MyMemory（`auto`）；有道整句失败是预期，由降级兜住。
+- 单词走有道、整句走谷歌（`auto`）；失败降级 MyMemory/有道；有道整句失败是预期，由降级兜住。
 - 面板失焦 / 切到其它 App 时按 `hideOnBlur` 隐藏（默认开）。
-- 默认不自动写剪贴板；关掉面板时可能还原剪贴板快照。
+- 默认不自动写剪贴板；开启「自动复制」后译文会留在剪贴板（不做还原）。
+- 快捷键录制禁止裸 ⌘+字母/数字（会全局抢占其它 App 菜单快捷键）与单独 ⇧。
 
 ### Verify before claiming done
 
@@ -89,7 +90,7 @@ open build/Lumen.app
 | Esc / 失焦 | 隐藏面板 |
 | 菜单栏书本图标 | 打开面板、设置、退出 |
 
-设置（齿轮）：引擎（自动 / 有道 / MyMemory / OpenAI 兼容）、快捷键、失焦隐藏等。
+设置（齿轮）：引擎（自动 / 有道 / 谷歌 / MyMemory）、快捷键、失焦隐藏等。
 
 ### 常见问题
 
@@ -97,4 +98,5 @@ open build/Lumen.app
 |------|------|
 | 快捷键无反应 | 设置里重新录制；可能被其它 App 占用 |
 | 一直「翻译中…」 | 多为 UI 未刷新或网络失败；跑 `--selftest` 看引擎 |
-| MyMemory 失败 | 免费额度用尽；换引擎或配 OpenAI 兼容接口 |
+| MyMemory 失败 | 免费额度用尽；换引擎 |
+| 谷歌引擎失败/慢 | 非官方接口，国内需系统代理；无代理时建议切其它引擎 |
