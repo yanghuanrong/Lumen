@@ -128,6 +128,11 @@ struct SettingsView: View {
                     detail: "从菜单栏可快速打开与退出",
                     isOn: $settings.showMenuBarItem
                 )
+                toggle(
+                    "开机自动启动",
+                    detail: "登录 macOS 后自动运行 Lumen",
+                    isOn: $settings.launchAtLogin
+                )
             }
         }
     }
@@ -135,17 +140,8 @@ struct SettingsView: View {
     // MARK: - 高级
 
     private var advancedSection: some View {
-        section("高级 · OpenAI 兼容接口（可选）", icon: "cpu") {
+        section("高级（可选）", icon: "cpu") {
             VStack(alignment: .leading, spacing: 8) {
-                Text("配置后将作为「自动」模式的优先兜底引擎。兼容 DeepSeek、智谱、Ollama 等。")
-                    .font(.system(size: 11))
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
-
-                field("接口地址", text: $settings.openAIBaseURL, placeholder: "https://api.openai.com/v1")
-                field("模型", text: $settings.openAIModel, placeholder: "gpt-4o-mini")
-                field("API Key", text: $settings.openAIKey, placeholder: "本地模型可留空", isSecure: true)
-
                 Text("MyMemory 邮箱（可选，用于提升免费额度）")
                     .font(.system(size: 11))
                     .foregroundStyle(.secondary)
@@ -156,9 +152,14 @@ struct SettingsView: View {
 
     // MARK: - Footer
 
+    /// 从 Info.plist 读取版本号；swift run 等无 bundle 场景回退为 dev
+    private static var appVersion: String {
+        Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "dev"
+    }
+
     private var footer: some View {
         HStack {
-            Text("Lumen v0.1.0")
+            Text("Lumen v\(Self.appVersion)")
                 .font(.system(size: 10.5))
                 .foregroundStyle(.tertiary)
             Spacer()

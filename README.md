@@ -30,7 +30,7 @@ Sources/Lumen/
   App/PanelRenderer.swift    # 离屏渲染 PNG
   ViewModels/TranslationViewModel.swift  # 呼出→翻译→复制；须转发 translator 变更
   Translate/Translator.swift # 选路、降级、缓存
-  Translate/YoudaoEngine.swift / MyMemoryEngine.swift / OpenAICompatibleEngine.swift
+  Translate/YoudaoEngine.swift / GoogleEngine.swift / MyMemoryEngine.swift
   HotKey/GlobalHotKeyManager.swift
   Window/FloatingPanel.swift
   Views/TranslationPanelView.swift / SettingsView.swift
@@ -42,9 +42,11 @@ Sources/Lumen/
 ### Behavior notes (easy to break)
 
 - UI 只观察 `TranslationViewModel`：`translator` 的 `@Published` 必须转发到 viewModel，否则会卡在「翻译中…」。
-- 单词走有道、整句走 MyMemory（`auto`）；有道整句失败是预期，由降级兜住。
+- 单词走有道、整句走谷歌（`auto`）；失败降级 MyMemory/有道；有道整句失败是预期，由降级兜住。
 - 面板失焦 / 切到其它 App 时按 `hideOnBlur` 隐藏（默认开）。
-- 默认不自动写剪贴板；关掉面板时可能还原剪贴板快照。
+- 默认不自动写剪贴板；开启「自动复制」后译文会留在剪贴板（不做还原）。
+- 快捷键录制禁止裸 ⌘+字母/数字（会全局抢占其它 App 菜单快捷键）与单独 ⇧。
+- 开机自启用 `SMAppService`（macOS 13+）；启动时以系统登录项实际状态为准修正设置。
 
 ### Verify before claiming done
 
@@ -70,13 +72,26 @@ swift run Lumen --render "serendipity" /tmp/lumen-word.png
 ### 安装运行
 
 ```bash
+# 方式一：下载正式包（带版本号）
+# 打开 https://github.com/yanghuanrong/Lumen/releases 下载 Lumen-x.y.z.dmg
+# 挂载后把 Lumen 拖入 Applications
+
+# 方式二：本地构建
 ./build.sh
 open build/Lumen.app
 # 可选：cp -R build/Lumen.app /Applications/
 ```
 
 首次打开若被拦截：右键 → 打开，或  
-`xattr -d com.apple.quarantine /Applications/Lumen.app`
+`xattr -d com.apple.quarantine /Applications/Lumen.app`  
+（无开发者账号无法公证，从网上下载的包首次打开需手动放行）
+
+### 发布新版本
+
+1. 改 `build.sh` 里的 `VERSION` 默认值
+2. 合入 `main` 后打标签：`git tag v0.1.0 && git push origin v0.1.0`
+3. `release.yml` 自动构建 `Lumen-<版本>.dmg` 并创建 GitHub Release
+4. 下载页：`https://github.com/yanghuanrong/Lumen/releases`
 
 ### 日常使用
 
@@ -88,8 +103,9 @@ open build/Lumen.app
 | 复制译文 | 面板按钮（可在设置开「自动复制」） |
 | Esc / 失焦 | 隐藏面板 |
 | 菜单栏书本图标 | 打开面板、设置、退出 |
+| 开机自启 | 设置 → 行为 → 开机自动启动 |
 
-设置（齿轮）：引擎（自动 / 有道 / MyMemory / OpenAI 兼容）、快捷键、失焦隐藏等。
+设置（齿轮）：引擎（自动 / 有道 / 谷歌 / MyMemory）、快捷键、失焦隐藏等。
 
 ### 常见问题
 
@@ -97,4 +113,6 @@ open build/Lumen.app
 |------|------|
 | 快捷键无反应 | 设置里重新录制；可能被其它 App 占用 |
 | 一直「翻译中…」 | 多为 UI 未刷新或网络失败；跑 `--selftest` 看引擎 |
-| MyMemory 失败 | 免费额度用尽；换引擎或配 OpenAI 兼容接口 |
+| MyMemory 失败 | 免费额度用尽；换引擎 |
+| 谷歌引擎失败/慢 | 非官方接口，国内需系统代理；无代理时建议切其它引擎 |
+| 有道释义/音标缺失 | 网页端接口临时改版或限流；译文不受影响（自动走谷歌/MyMemory） |

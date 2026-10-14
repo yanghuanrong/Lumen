@@ -11,7 +11,8 @@ cd "$(dirname "$0")"
 
 APP_NAME="Lumen"
 BUNDLE_ID="com.lumen.translate"
-VERSION="0.1.0"
+# 可用环境变量覆盖，CI 从 git tag 提取版本：LUMEN_VERSION=0.2.0 ./build.sh
+VERSION="${LUMEN_VERSION:-0.1.0}"
 BUILD_DIR="build"
 APP_DIR="${BUILD_DIR}/${APP_NAME}.app"
 
@@ -162,8 +163,23 @@ codesign --force --sign - --timestamp=none "${APP_DIR}" 2>/dev/null || {
     echo "    签名跳过（不影响本机运行）"
 }
 
+echo "==> 打包 DMG"
+DMG_PATH="${BUILD_DIR}/Lumen-${VERSION}.dmg"
+STAGING="${BUILD_DIR}/dmg-staging"
+rm -rf "${STAGING}" "${DMG_PATH}"
+mkdir -p "${STAGING}"
+cp -R "${APP_DIR}" "${STAGING}/"
+# 拖拽安装用的 /Applications 快捷方式
+ln -s /Applications "${STAGING}/Applications"
+hdiutil create -volname "${APP_NAME}" \
+    -srcfolder "${STAGING}" \
+    -format UDZO \
+    "${DMG_PATH}" -ov >/dev/null
+rm -rf "${STAGING}"
+
 echo ""
 echo "✅ 构建完成: ${APP_DIR}"
+echo "✅ DMG 打包完成: ${DMG_PATH}"
 echo ""
 echo "运行方式："
 echo "  open ${APP_DIR}                # 启动"

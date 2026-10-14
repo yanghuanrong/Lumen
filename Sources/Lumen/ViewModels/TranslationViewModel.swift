@@ -19,9 +19,6 @@ final class TranslationViewModel: ObservableObject {
     private let settings: SettingsStore
     private var cancellables = Set<AnyCancellable>()
 
-    /// 呼出时的剪贴板快照，用于避免污染用户剪贴板
-    private var clipboardSnapshot: ClipboardService.Snapshot?
-
     var output: TranslationOutput? { translator.output }
     var isTranslating: Bool { translator.isTranslating }
     var errorMessage: String? { translator.errorMessage }
@@ -42,7 +39,6 @@ final class TranslationViewModel: ObservableObject {
 
     /// 热键触发：读取剪贴板 → 填充输入框 → 自动翻译
     func onHotkeyTriggered() {
-        snapshotClipboard()
         loadClipboardIfNeeded()
         if !inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             translator.translate(inputText)
@@ -55,10 +51,6 @@ final class TranslationViewModel: ObservableObject {
         translator.translate(text)
     }
 
-    private func snapshotClipboard() {
-        clipboardSnapshot = ClipboardService.snapshot()
-    }
-
     private func loadClipboardIfNeeded() {
         guard settings.autoPasteClipboard else {
             if !settings.keepLastInput {
@@ -69,12 +61,6 @@ final class TranslationViewModel: ObservableObject {
 
         guard let text = ClipboardService.currentText(),
               !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-            if !settings.keepLastInput { inputText = "" }
-            return
-        }
-
-        // 命中断板哨兵值说明没有新内容
-        if text == LumenStrings.monitorSentinel {
             if !settings.keepLastInput { inputText = "" }
             return
         }
@@ -113,7 +99,7 @@ final class TranslationViewModel: ObservableObject {
 
     // MARK: - 复制
 
-    /// 复制译文到剪贴板，并按设置决定是否还原用户原剪贴板
+    /// 复制译文到剪贴板
     func copyResult(_ output: TranslationOutput? = nil) {
         guard let text = (output ?? translator.output)?.translated,
               !text.isEmpty else { return }
@@ -129,20 +115,14 @@ final class TranslationViewModel: ObservableObject {
         lastAction = .copied
     }
 
-    /// 关闭面板时按需还原剪贴板
+    /// 关闭面板：取消进行中的翻译。开启自动复制时译文保留在剪贴板，不做还原
     func onHide() {
-        if settings.autoCopyResult, let out = translator.output, !out.translated.isEmpty {
-            if let snapshot = clipboardSnapshot {
-                _ = ClipboardService.restoreIfUnchanged(snapshot, newText: out.translated)
-            }
-        }
         translator.cancel()
     }
 
     func clear() {
         inputText = ""
         translator.clear()
-        clipboardSnapshot = nil
     }
 
     private func flashCopied() {

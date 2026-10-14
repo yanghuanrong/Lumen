@@ -51,10 +51,6 @@ final class FloatingPanelController {
 
     private(set) var panel: FloatingPanel!
     private let settings: SettingsStore
-    private var windowObserver: NSObjectProtocol?
-
-    /// 记录上一次位置，避免每次都居中导致闪烁
-    private var lastFrame: NSRect?
 
     /// 默认尺寸
     private let defaultSize = NSSize(width: 460, height: 340)
@@ -98,29 +94,41 @@ final class FloatingPanelController {
 
     private func positionWindow() {
         var frame = panel.frame
+        frame.size = clampedSize(frame.size)
 
-        if let lastFrame, isFrameOnScreen(lastFrame) {
-            frame = lastFrame
-        } else {
-            // 默认贴到当前鼠标所在屏幕的右上角，符合划词工具习惯
-            if let screen = screenUnderMouse() {
-                let visible = screen.visibleFrame
-                frame.size = clampedSize(defaultSize)
-                frame.origin.x = visible.maxX - frame.width - 24
-                frame.origin.y = visible.maxY - frame.height - 24
-            } else {
-                frame.size = clampedSize(defaultSize)
-                // 无鼠标位置信息时退回主屏居中
-                frame.origin = NSPoint(
-                    x: (NSScreen.main?.visibleFrame.midX ?? 0) - frame.width / 2,
-                    y: (NSScreen.main?.visibleFrame.midY ?? 0) - frame.height / 2
-                )
+        let mouse = NSEvent.mouseLocation
+        if let screen = NSScreen.screens.first(where: { $0.frame.contains(mouse) }) ?? NSScreen.main {
+            let visible = screen.visibleFrame
+            // 鼠标点作为窗口左上角（macOS 坐标系 y 向上），面板出现在鼠标右下方
+            frame.origin.x = mouse.x
+            frame.origin.y = mouse.y - frame.height
+
+            // 逐边夹紧，保证窗口完整落在屏幕可见区域内
+            if frame.maxX > visible.maxX {
+                frame.origin.x = visible.maxX - frame.width
             }
+            if frame.minX < visible.minX {
+                frame.origin.x = visible.minX
+            }
+            if frame.maxY > visible.maxY {
+                frame.origin.y = visible.maxY - frame.height
+            }
+            if frame.minY < visible.minY {
+                frame.origin.y = visible.minY
+            }
+            // 鼠标紧贴屏幕边缘且窗口高于可见区域时，右下都无法完全容纳，优先保证底部可见
+            if frame.height > visible.height {
+                frame.origin.y = visible.minY
+            }
+        } else {
+            // 无鼠标位置信息时退回主屏居中
+            frame.origin = NSPoint(
+                x: (NSScreen.main?.visibleFrame.midX ?? 0) - frame.width / 2,
+                y: (NSScreen.main?.visibleFrame.midY ?? 0) - frame.height / 2
+            )
         }
 
-        frame.size = clampedSize(frame.size)
         panel.setFrame(frame, display: false)
-        lastFrame = frame
     }
 
     private func clampedSize(_ size: NSSize) -> NSSize {
@@ -128,15 +136,6 @@ final class FloatingPanelController {
             width: max(minSize.width, min(size.width, 900)),
             height: max(minSize.height, min(size.height, 700))
         )
-    }
-
-    private func screenUnderMouse() -> NSScreen? {
-        let mouse = NSEvent.mouseLocation
-        return NSScreen.screens.first { $0.frame.contains(mouse) } ?? NSScreen.main
-    }
-
-    private func isFrameOnScreen(_ frame: NSRect) -> Bool {
-        NSScreen.screens.contains { $0.visibleFrame.intersects(frame) }
     }
 
     // MARK: - 初始化
@@ -148,23 +147,6 @@ final class FloatingPanelController {
         panel.minSize = minSize
         panel.setContentSize(clampedSize(defaultSize))
         panel.isReleasedWhenClosed = false
-
-        // 拖动后记住位置
-        windowObserver = NotificationCenter.default.addObserver(
-            forName: NSWindow.didMoveNotification,
-            object: panel,
-            queue: .main
-        ) { [weak self] _ in
-            Task { @MainActor in
-                self?.lastFrame = self?.panel.frame
-            }
-        }
-    }
-
-    deinit {
-        if let windowObserver {
-            NotificationCenter.default.removeObserver(windowObserver)
-        }
     }
 }
 

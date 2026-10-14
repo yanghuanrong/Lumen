@@ -1,0 +1,33 @@
+name: Release
+
+# 推 v* 标签时触发：构建 DMG 并创建 GitHub Release
+# 用法：git tag v0.1.0 && git push origin v0.1.0
+on:
+  push:
+    tags: ['v*']
+
+jobs:
+  release:
+    runs-on: macos-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build app and DMG
+        env:
+          # 从 tag 提取版本号（v0.1.0 -> 0.1.0），与 build.sh 的 VERSION 对齐
+          LUMEN_VERSION: ${{ github.ref_name }}
+        run: |
+          # github.ref_name 形如 v0.1.0，去掉前缀 v
+          export LUMEN_VERSION="${LUMEN_VERSION#v}"
+          ./build.sh
+
+      - name: Create release and upload DMG
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          gh release create "$TAG" build/Lumen-*.dmg \
+            --title "Lumen $TAG" \
+            --generate-notes
