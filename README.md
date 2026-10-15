@@ -1,5 +1,10 @@
 # Lumen
 
+[![Version](https://img.shields.io/github/v/tag/yanghuanrong/Lumen?label=version)](https://github.com/yanghuanrong/Lumen/releases)
+[![DMG 体积](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fapi.github.com%2Frepos%2Fyanghuanrong%2FLumen%2Freleases%2Flatest&query=%24.assets%5B0%5D.size&label=DMG%20%E4%BD%93%E7%A7%AF&suffix=%20B&color=blue)](https://github.com/yanghuanrong/Lumen/releases/latest)
+[![Platform](https://img.shields.io/badge/platform-macOS%2013%2B-lightgrey)](https://github.com/yanghuanrong/Lumen)
+[![Downloads](https://img.shields.io/github/downloads/yanghuanrong/Lumen/total?label=downloads)](https://github.com/yanghuanrong/Lumen/releases)
+
 macOS 划词翻译小工具：快捷键呼出 → 读剪贴板 → 中英互译。SwiftUI + AppKit，无 Dock 图标。
 
 ---
