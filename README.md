@@ -1,7 +1,7 @@
 # Lumen
 
 [![Version](https://img.shields.io/github/v/tag/yanghuanrong/Lumen?label=version)](https://github.com/yanghuanrong/Lumen/releases)
-[![DMG 体积](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fapi.github.com%2Frepos%2Fyanghuanrong%2FLumen%2Freleases%2Flatest&query=%24.assets%5B0%5D.size&label=DMG%20%E4%BD%93%E7%A7%AF&suffix=%20B&color=blue)](https://github.com/yanghuanrong/Lumen/releases/latest)
+[![DMG 体积](https://img.shields.io/badge/DMG%E4%BD%93%E7%A7%AF-1.2MB-blue)](https://github.com/yanghuanrong/Lumen/releases/latest)
 [![Platform](https://img.shields.io/badge/platform-macOS%2013%2B-lightgrey)](https://github.com/yanghuanrong/Lumen)
 [![Downloads](https://img.shields.io/github/downloads/yanghuanrong/Lumen/total?label=downloads)](https://github.com/yanghuanrong/Lumen/releases)
 
