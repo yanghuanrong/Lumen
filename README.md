@@ -46,6 +46,19 @@
 
 ## 安装指南
 
+### 通过 Homebrew 安装
+
+```bash
+brew tap yanghuanrong/tap
+brew install --cask peek
+```
+
+更新：
+
+```bash
+brew update && brew upgrade --cask peek
+```
+
 ### 下载安装
 
 1. 从 [Release](https://github.com/yanghuanrong/Peek/releases/latest) 页面下载最新的 `Peek-x.y.z.dmg`
