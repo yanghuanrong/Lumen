@@ -110,7 +110,7 @@ struct HotKeyRecorder: NSViewRepresentable {
             let hasOptionOrControl = flags.contains(.option) || flags.contains(.control)
             if flags.contains(.command) && !hasOptionOrControl && isPlainKey(event) {
                 NSSound.beep()
-                label.stringValue = "⌘+字母/数字易与其它 App 冲突，请加 ⌥/⌃"
+                label.stringValue = "⌘+字母易与其它 App 冲突，请加 ⌥/⌃"
                 return
             }
 
@@ -126,14 +126,15 @@ struct HotKeyRecorder: NSViewRepresentable {
             window?.makeFirstResponder(nil)
         }
 
-        /// 是否为字母 / 数字 / 空格 / Tab 这类几乎所有 App 都会用作菜单快捷键的键
+        /// 是否为字母 / 空格 / Tab 这类几乎所有 App 都会用作菜单快捷键的键
+        /// （数字不拦：允许 ⌘0~⌘9，如 ⌘0 呼出面板）
         private func isPlainKey(_ event: NSEvent) -> Bool {
             if event.keyCode == UInt16(kVK_Space) || event.keyCode == UInt16(kVK_Tab) {
                 return true
             }
             guard let ch = event.charactersIgnoringModifiers, ch.count == 1,
                   let scalar = ch.unicodeScalars.first else { return false }
-            return CharacterSet.alphanumerics.contains(scalar)
+            return CharacterSet.letters.contains(scalar)
         }
     }
 }

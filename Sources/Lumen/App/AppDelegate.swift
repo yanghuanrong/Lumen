@@ -21,6 +21,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     // MARK: - 生命周期
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        buildMainMenu()
         buildPanel()
         buildSettingsWindow()
         observePanelBlur()
@@ -43,6 +44,27 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows: Bool) -> Bool {
         togglePanel()
         return true
+    }
+
+    // MARK: - 主菜单
+
+    /// 安装最小主菜单（仅全选）。
+    /// AppKit 的 ⌘A 依赖主菜单查表分发；
+    /// 菜单栏应用不设主菜单时，输入框 field editor 收不到这个动作。
+    private func buildMainMenu() {
+        let mainMenu = NSMenu()
+
+        let editMenuItem = NSMenuItem()
+        editMenuItem.submenu = {
+            let editMenu = NSMenu(title: "编辑")
+            editMenu.addItem(
+                NSMenuItem(title: "全选", action: #selector(NSText.selectAll(_:)), keyEquivalent: "a")
+            )
+            return editMenu
+        }()
+        mainMenu.addItem(editMenuItem)
+
+        NSApp.mainMenu = mainMenu
     }
 
     // MARK: - 面板
