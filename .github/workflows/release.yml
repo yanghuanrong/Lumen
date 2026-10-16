@@ -23,11 +23,47 @@ jobs:
           export LUMEN_VERSION="${LUMEN_VERSION#v}"
           ./build.sh
 
+      - name: Sign DMG and generate appcast
+        env:
+          SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          VERSION="${TAG#v}"
+          DMG="build/Lumen-${VERSION}.dmg"
+
+          SIG_OUTPUT="$(swift scripts/sign_update.swift "${DMG}" "${SPARKLE_PRIVATE_KEY}")"
+          echo "${SIG_OUTPUT}"
+          ED_SIG="$(echo "${SIG_OUTPUT}" | sed -n 's/.*sparkle:edSignature="\([^"]*\)".*/\1/p')"
+          LENGTH="$(echo "${SIG_OUTPUT}" | sed -n 's/.*length="\([^"]*\)".*/\1/p')"
+
+          cat > build/appcast.xml <<APPCAST
+          <?xml version="1.0" encoding="utf-8"?>
+          <rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" xmlns:dc="http://purl.org/dc/elements/1.1/">
+            <channel>
+              <title>Lumen 更新</title>
+              <item>
+                <title>Lumen ${VERSION}</title>
+                <sparkle:version>${VERSION}</sparkle:version>
+                <sparkle:shortVersionString>${VERSION}</sparkle:shortVersionString>
+                <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
+                <enclosure
+                  url="https://github.com/yanghuanrong/Lumen/releases/download/${TAG}/Lumen-${VERSION}.dmg"
+                  sparkle:edSignature="${ED_SIG}"
+                  length="${LENGTH}"
+                  type="application/x-apple-diskimage"
+                />
+              </item>
+            </channel>
+          </rss>
+          APPCAST
+
+          cat build/appcast.xml
+
       - name: Create release and upload DMG
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           TAG="${GITHUB_REF_NAME}"
-          gh release create "$TAG" build/Lumen-*.dmg \
+          gh release create "$TAG" build/Lumen-*.dmg build/appcast.xml \
             --title "Lumen $TAG" \
             --generate-notes
