@@ -67,3 +67,36 @@ jobs:
           gh release create "$TAG" build/Lumen-*.dmg build/appcast.xml \
             --title "Lumen $TAG" \
             --generate-notes
+
+      - name: Update README DMG size badge
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          VERSION="${TAG#v}"
+          BYTES="$(stat -f%z "build/Lumen-${VERSION}.dmg")"
+          # 按数值自动选 KB / MB
+          if [ "${BYTES}" -ge 1048576 ]; then
+            SIZE="$(awk "BEGIN{printf \"%.1f\", ${BYTES}/1048576}")MB"
+          else
+            SIZE="$(awk "BEGIN{printf \"%.1f\", ${BYTES}/1024}")KB"
+          fi
+          echo "DMG 体积: ${SIZE}"
+
+          # 切回 main（tag checkout 是 detached HEAD）
+          git fetch origin main
+          git checkout main
+          git reset --hard origin/main
+
+          # 替换 README 中的 DMG 体积徽章（静态徽章，每次发版刷新）
+          sed -i '' -E \
+            "s|(\\[!\\[DMG 体积\\]\\()https[^)]*(\\)\\].*)|\\1https://img.shields.io/badge/DMG%E4%BD%93%E7%A7%AF-${SIZE}-blue\\2|" \
+            README.md
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add README.md
+          if git diff --cached --quiet; then
+            echo "README 无变化，跳过提交"
+          else
+            git commit -m "docs: 更新 DMG 体积徽章为 ${SIZE} [skip ci]"
+            git push origin main
+          fi
