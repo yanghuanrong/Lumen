@@ -12,11 +12,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private lazy var viewModel = TranslationViewModel(translator: translator, settings: settings)
 
     private let hotKeyManager = GlobalHotKeyManager()
-    private let updaterController = SPUStandardUpdaterController(
-        startingUpdater: true,
-        updaterDelegate: nil,
-        userDriverDelegate: nil
-    )
+    // 自检 / 离屏渲染等无 bundle 的运行模式（swift run 裸二进制）不启动更新器，
+    // 否则 Sparkle 在无 Info.plist 环境下会异常挂起
+    private lazy var updaterController: SPUStandardUpdaterController? =
+        Bundle.main.object(forInfoDictionaryKey: "SUFeedURL") != nil
+        ? SPUStandardUpdaterController(
+            startingUpdater: true,
+            updaterDelegate: nil,
+            userDriverDelegate: nil
+        )
+        : nil
     private var panelController: FloatingPanelController!
     private var settingsWindow: NSWindow!
     private var statusItem: NSStatusItem?
@@ -322,15 +327,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         settingsItem.target = self
         menu.addItem(settingsItem)
 
-        menu.addItem(.separator())
+        if let updaterController {
+            menu.addItem(.separator())
 
-        let checkUpdateItem = NSMenuItem(
-            title: "检查更新…",
-            action: #selector(SPUStandardUpdaterController.checkForUpdates(_:)),
-            keyEquivalent: ""
-        )
-        checkUpdateItem.target = updaterController
-        menu.addItem(checkUpdateItem)
+            let checkUpdateItem = NSMenuItem(
+                title: "检查更新…",
+                action: #selector(SPUStandardUpdaterController.checkForUpdates(_:)),
+                keyEquivalent: ""
+            )
+            checkUpdateItem.target = updaterController
+            menu.addItem(checkUpdateItem)
+        }
 
         let quitItem = NSMenuItem(title: "退出 Lumen", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
         menu.addItem(quitItem)
