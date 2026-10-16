@@ -5,8 +5,8 @@ build/
 DerivedData/
 
 # Xcode 工程（由 scripts/generate_xcodeproj.rb 生成）
-Lumen.xcodeproj/
-Lumen.xcworkspace/
+Peek.xcodeproj/
+Peek.xcworkspace/
 
 # 生成的图标
 Resources/AppIcon.icns

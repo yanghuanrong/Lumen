@@ -2,7 +2,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "Lumen",
+    name: "Peek",
     platforms: [.macOS(.v13)],
     dependencies: [
         // 自动更新框架（用户已确认引入）
@@ -10,11 +10,11 @@ let package = Package(
     ],
     targets: [
         .executableTarget(
-            name: "Lumen",
+            name: "Peek",
             dependencies: [
                 .product(name: "Sparkle", package: "Sparkle"),
             ],
-            path: "Sources/Lumen",
+            path: "Sources/Peek",
             swiftSettings: [.swiftLanguageMode(.v5)],
             // 打包后 Sparkle.framework 位于 .app/Contents/Frameworks
             linkerSettings: [

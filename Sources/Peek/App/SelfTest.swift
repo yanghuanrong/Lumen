@@ -3,11 +3,11 @@ import Carbon.HIToolbox
 import Foundation
 
 /// 命令行自检：验证语言识别与各引擎连通性。
-/// 用法： swift run Lumen --selftest
+/// 用法： swift run Peek --selftest
 enum SelfTest {
 
     static func run() async {
-        print("=== Lumen 自检 ===\n")
+        print("=== Peek 自检 ===\n")
 
         // 1. 语言识别
         print("[1] 语言识别")

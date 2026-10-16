@@ -15,4 +15,4 @@ jobs:
         run: swift build
 
       - name: Selftest
-        run: swift run Lumen --selftest
+        run: swift run Peek --selftest

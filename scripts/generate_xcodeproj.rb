@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 #
-# 生成 Lumen.xcodeproj —— 让项目能在 Xcode 里直接打开、断点调试、查看视图层级。
+# 生成 Peek.xcodeproj —— 让项目能在 Xcode 里直接打开、断点调试、查看视图层级。
 #
 # 为什么要生成工程而不是直接打开 Package.swift：
 #   1. SPM 包在 Xcode 里调试会触发包依赖解析，本机沙箱环境下容易失败；
@@ -9,15 +9,15 @@
 #      Xcode 里的运行/调试体验与打包产物一致。
 #
 # 用法： ruby scripts/generate_xcodeproj.rb
-# 生成后： open Lumen.xcodeproj
+# 生成后： open Peek.xcodeproj
 
 require 'xcodeproj'
 require 'fileutils'
 
 ROOT = File.expand_path('..', __dir__)
-PROJECT_PATH = File.join(ROOT, 'Lumen.xcodeproj')
-TARGET_NAME = 'Lumen'
-BUNDLE_ID = 'com.lumen.translate'
+PROJECT_PATH = File.join(ROOT, 'Peek.xcodeproj')
+TARGET_NAME = 'Peek'
+BUNDLE_ID = 'com.peek.translate'
 DEPLOYMENT_TARGET = '13.0'
 
 FileUtils.rm_rf(PROJECT_PATH)
@@ -35,7 +35,7 @@ target = project.new_target(
 sources_root = File.join(ROOT, 'Sources', TARGET_NAME)
 swift_files = Dir.glob(File.join(sources_root, '**', '*.swift')).sort
 
-group = project.new_group(TARGET_NAME, 'Sources/Lumen')
+group = project.new_group(TARGET_NAME, 'Sources/Peek')
 swift_files.each do |path|
   ref = group.new_reference(path)
   target.add_file_references([ref])
@@ -65,7 +65,7 @@ File.write(info_plist_path, <<~PLIST)
       <key>NSHighResolutionCapable</key>         <true/>
       <!-- 无 Dock 图标，仅菜单栏 + 浮动面板 -->
       <key>LSUIElement</key>                     <true/>
-      <key>NSHumanReadableCopyright</key>        <string>Lumen · 个人划词翻译工具</string>
+      <key>NSHumanReadableCopyright</key>        <string>Peek · 个人划词翻译工具</string>
   </dict>
   </plist>
 PLIST
@@ -119,7 +119,7 @@ project.save
 scheme = Xcodeproj::XCScheme.new
 scheme.add_build_target(target)
 scheme.set_launch_target(target)
-# 调试时默认选中 Lumen scheme
+# 调试时默认选中 Peek scheme
 scheme.launch_action.build_configuration = 'Debug'
 scheme.test_action.build_configuration = 'Debug'
 
