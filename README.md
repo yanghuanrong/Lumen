@@ -91,12 +91,6 @@ open build/Peek.app
 | 有道音标/释义缺失 | 网页端接口临时改版或限流；译文不受影响（自动走谷歌/MyMemory） |
 | 想换默认快捷键 | 设置（齿轮）→ 快捷键 → 点击录制框按下新组合 |
 
-## 感谢
-
-- [Pot](https://github.com/pot-app/pot-desktop) README 结构参考与灵感
-- [Bob](https://github.com/ripperhe/Bob) 交互灵感
-- [Sparkle](https://github.com/sparkle-project/Sparkle) 自动更新框架
-
 ---
 
 <details>
