@@ -183,7 +183,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             backing: .buffered,
             defer: false
         )
-        settingsWindow.title = "Lumen 设置"
+        settingsWindow.title = "Peek 设置"
         settingsWindow.contentView = NSHostingView(rootView: AnyView(view))
         settingsWindow.titlebarAppearsTransparent = true
         settingsWindow.titleVisibility = .hidden
@@ -297,7 +297,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
             item.button?.image = NSImage(
                 systemSymbolName: "character.book.closed",
-                accessibilityDescription: "Lumen"
+                accessibilityDescription: "Peek"
             )
             item.button?.image?.isTemplate = true
             item.menu = buildStatusMenu()
@@ -339,7 +339,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             menu.addItem(checkUpdateItem)
         }
 
-        let quitItem = NSMenuItem(title: "退出 Lumen", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
+        let quitItem = NSMenuItem(title: "退出 Peek", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
         menu.addItem(quitItem)
 
         return menu

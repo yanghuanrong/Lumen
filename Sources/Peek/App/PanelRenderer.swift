@@ -3,7 +3,7 @@ import SwiftUI
 
 /// 离屏渲染验证：把面板视图渲染成 PNG。
 /// 不依赖窗口位置与屏幕录制权限，用于在无人工干预时确认 UI 真的能画出来。
-/// 用法： ./Lumen --render "serendipity" /tmp/out.png
+/// 用法： ./Peek --render "serendipity" /tmp/out.png
 @MainActor
 enum PanelRenderer {
 

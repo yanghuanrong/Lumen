@@ -1,5 +1,5 @@
 ---
-description: Lumen 仓库禁止直推 main，必须走 PR + 审查
+description: Peek 仓库禁止直推 main，必须走 PR + 审查
 alwaysApply: true
 ---
 

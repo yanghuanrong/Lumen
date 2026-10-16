@@ -1,6 +1,6 @@
 import Foundation
 
-/// Lumen 只处理中文 ⇄ 英文两种语言，方向自动判定。
+/// Peek 只处理中文 ⇄ 英文两种语言，方向自动判定。
 enum Language: String, CaseIterable, Codable, Sendable {
     case chinese
     case english

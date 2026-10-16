@@ -1,9 +1,9 @@
-# Lumen
+# Peek
 
-[![Version](https://img.shields.io/github/v/tag/yanghuanrong/Lumen?label=version)](https://github.com/yanghuanrong/Lumen/releases)
-[![DMG 体积](https://img.shields.io/badge/DMG%E4%BD%93%E7%A7%AF-1.2MB-blue)](https://github.com/yanghuanrong/Lumen/releases/latest)
-[![Platform](https://img.shields.io/badge/platform-macOS%2013%2B-lightgrey)](https://github.com/yanghuanrong/Lumen)
-[![Downloads](https://img.shields.io/github/downloads/yanghuanrong/Lumen/total?label=downloads)](https://github.com/yanghuanrong/Lumen/releases)
+[![Version](https://img.shields.io/github/v/tag/yanghuanrong/Peek?label=version)](https://github.com/yanghuanrong/Peek/releases)
+[![DMG 体积](https://img.shields.io/badge/DMG%E4%BD%93%E7%A7%AF-1.2MB-blue)](https://github.com/yanghuanrong/Peek/releases/latest)
+[![Platform](https://img.shields.io/badge/platform-macOS%2013%2B-lightgrey)](https://github.com/yanghuanrong/Peek)
+[![Downloads](https://img.shields.io/github/downloads/yanghuanrong/Peek/total?label=downloads)](https://github.com/yanghuanrong/Peek/releases)
 
 macOS 划词翻译小工具：快捷键呼出 → 读剪贴板 → 中英互译。SwiftUI + AppKit，无 Dock 图标。
 
@@ -28,7 +28,7 @@ macOS 划词翻译小工具：快捷键呼出 → 读剪贴板 → 中英互译�
 ### Layout (edit here)
 
 ```
-Sources/Lumen/
+Sources/Peek/
   main.swift                 # 入口；--selftest / --render / --demo
   App/AppDelegate.swift      # 生命周期、热键、面板显隐（含失焦隐藏）
   App/SelfTest.swift         # 命令行自检
@@ -57,9 +57,9 @@ Sources/Lumen/
 
 ```bash
 swift build
-swift run Lumen --selftest          # 引擎与调度；应几乎全 ✓
-swift run Lumen --render "serendipity" /tmp/lumen-word.png
-./build.sh debug && open build/Lumen.app
+swift run Peek --selftest          # 引擎与调度；应几乎全 ✓
+swift run Peek --render "serendipity" /tmp/peek-word.png
+./build.sh debug && open build/Peek.app
 ```
 
 交互抽查：`⌥D`（可改）呼出 → 出结果 → 点其它 App 面板应收起。
@@ -67,7 +67,7 @@ swift run Lumen --render "serendipity" /tmp/lumen-word.png
 ### Do not
 
 - 不要把 pot-desktop / Tauri 方案搬进来；本项目是原生 Swift。
-- 不要提交 `.build/`、`build/`、`Lumen.xcodeproj/`、`xcuserdata`。
+- 不要提交 `.build/`、`build/`、`Peek.xcodeproj/`、`xcuserdata`。
 - 不要在 README 里堆长篇「如何用 Xcode 下断点」——那些信息应落在代码注释或 PR 里，需要时再搜源码。
 
 ---
@@ -78,25 +78,25 @@ swift run Lumen --render "serendipity" /tmp/lumen-word.png
 
 ```bash
 # 方式一：下载正式包（带版本号）
-# 打开 https://github.com/yanghuanrong/Lumen/releases 下载 Lumen-x.y.z.dmg
-# 挂载后把 Lumen 拖入 Applications
+# 打开 https://github.com/yanghuanrong/Peek/releases 下载 Peek-x.y.z.dmg
+# 挂载后把 Peek 拖入 Applications
 
 # 方式二：本地构建
 ./build.sh
-open build/Lumen.app
-# 可选：cp -R build/Lumen.app /Applications/
+open build/Peek.app
+# 可选：cp -R build/Peek.app /Applications/
 ```
 
 首次打开若被拦截：右键 → 打开，或  
-`xattr -d com.apple.quarantine /Applications/Lumen.app`  
+`xattr -d com.apple.quarantine /Applications/Peek.app`  
 （无开发者账号无法公证，从网上下载的包首次打开需手动放行）
 
 ### 发布新版本
 
 1. 改 `build.sh` 里的 `VERSION` 默认值
 2. 合入 `main` 后打标签：`git tag v0.1.0 && git push origin v0.1.0`
-3. `release.yml` 自动构建 `Lumen-<版本>.dmg` 并创建 GitHub Release
-4. 下载页：`https://github.com/yanghuanrong/Lumen/releases`
+3. `release.yml` 自动构建 `Peek-<版本>.dmg` 并创建 GitHub Release
+4. 下载页：`https://github.com/yanghuanrong/Peek/releases`
 
 ### 日常使用
 

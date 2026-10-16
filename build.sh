@@ -1,5 +1,5 @@
 #!/bin/bash
-# 构建 Lumen.app
+# 构建 Peek.app
 # 用法：
 #   ./build.sh          # release 构建 + 打包
 #   ./build.sh debug    # debug 构建 + 打包
@@ -9,19 +9,19 @@ set -euo pipefail
 CONFIG="${1:-release}"
 cd "$(dirname "$0")"
 
-APP_NAME="Lumen"
-BUNDLE_ID="com.lumen.translate"
-# 可用环境变量覆盖，CI 从 git tag 提取版本：LUMEN_VERSION=0.2.0 ./build.sh
-VERSION="${LUMEN_VERSION:-0.1.0}"
+APP_NAME="Peek"
+BUNDLE_ID="com.peek.translate"
+# 可用环境变量覆盖，CI 从 git tag 提取版本：PEEK_VERSION=0.2.0 ./build.sh
+VERSION="${PEEK_VERSION:-0.1.0}"
 BUILD_DIR="build"
 APP_DIR="${BUILD_DIR}/${APP_NAME}.app"
 
 # debug 参数会额外生成 Xcode 工程产物，方便断点调试
 if [ "$CONFIG" = "debug" ]; then
     echo "==> 生成 Xcode 工程（调试用）"
-    if [ -f Lumen.xcodeproj ]; then
-        echo "    已存在 Lumen.xcodeproj，跳过生成"
-        echo "    如需重建：rm -rf Lumen.xcodeproj && ruby scripts/generate_xcodeproj.rb"
+    if [ -f Peek.xcodeproj ]; then
+        echo "    已存在 Peek.xcodeproj，跳过生成"
+        echo "    如需重建：rm -rf Peek.xcodeproj && ruby scripts/generate_xcodeproj.rb"
     else
         if ruby scripts/generate_xcodeproj.rb 2>/dev/null; then
             echo "    ✅ 工程已生成"
@@ -83,10 +83,10 @@ cat > "${APP_DIR}/Contents/Info.plist" <<PLIST
     <key>LSUIElement</key>
     <true/>
     <key>NSHumanReadableCopyright</key>
-    <string>Lumen · 个人划词翻译工具</string>
+    <string>Peek · 个人划词翻译工具</string>
     <!-- Sparkle 自动更新 -->
     <key>SUFeedURL</key>
-    <string>https://github.com/yanghuanrong/Lumen/releases/latest/download/appcast.xml</string>
+    <string>https://github.com/yanghuanrong/Peek/releases/latest/download/appcast.xml</string>
     <key>SUPublicEDKey</key>
     <string>hAn4vBa2hKgaP1QnQ9r9zWbbdhxurnCQzoAbV/QV+S8=</string>
 </dict>
@@ -103,7 +103,7 @@ if [ ! -f "Resources/AppIcon.icns" ]; then
     mkdir -p "${ICONSET}"
 
     # 用SF Symbol 渲染图标为 PNG
-    cat > /tmp/lumen_icon.swift <<'SWIFT'
+    cat > /tmp/peek_icon.swift <<'SWIFT'
 import AppKit
 import Foundation
 
@@ -152,8 +152,8 @@ if let tiff = image.tiffRepresentation,
 }
 SWIFT
 
-    if swiftc -O /tmp/lumen_icon.swift -o /tmp/lumen_icon 2>/dev/null; then
-        /tmp/lumen_icon "${ICONSET}/icon_512x512@2x.png" 2>/dev/null || true
+    if swiftc -O /tmp/peek_icon.swift -o /tmp/peek_icon 2>/dev/null; then
+        /tmp/peek_icon "${ICONSET}/icon_512x512@2x.png" 2>/dev/null || true
         if [ -f "${ICONSET}/icon_512x512@2x.png" ]; then
             cp "${ICONSET}/icon_512x512@2x.png" "${ICONSET}/icon_512x512.png"
             for s in 16 32 64 128 256 512; do
@@ -182,7 +182,7 @@ codesign --force --sign - --timestamp=none "${APP_DIR}" 2>/dev/null || {
 }
 
 echo "==> 打包 DMG"
-DMG_PATH="${BUILD_DIR}/Lumen-${VERSION}.dmg"
+DMG_PATH="${BUILD_DIR}/Peek-${VERSION}.dmg"
 STAGING="${BUILD_DIR}/dmg-staging"
 rm -rf "${STAGING}" "${DMG_PATH}"
 mkdir -p "${STAGING}"

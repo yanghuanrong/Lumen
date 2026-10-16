@@ -55,7 +55,7 @@ struct TranslationPanelView: View {
                 .font(.system(size: 12))
                 .foregroundStyle(.tint)
 
-            Text("Lumen")
+            Text("Peek")
                 .font(.system(size: 12, weight: .semibold))
                 .foregroundStyle(.secondary)
 

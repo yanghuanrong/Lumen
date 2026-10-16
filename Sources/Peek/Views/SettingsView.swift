@@ -34,7 +34,7 @@ struct SettingsView: View {
             Image(systemName: "character.book.closed.fill")
                 .font(.system(size: 15))
                 .foregroundStyle(.tint)
-            Text("Lumen 设置")
+            Text("Peek 设置")
                 .font(.system(size: 14, weight: .semibold))
             Spacer()
         }
@@ -130,7 +130,7 @@ struct SettingsView: View {
                 )
                 toggle(
                     "开机自动启动",
-                    detail: "登录 macOS 后自动运行 Lumen",
+                    detail: "登录 macOS 后自动运行 Peek",
                     isOn: $settings.launchAtLogin
                 )
             }
@@ -159,7 +159,7 @@ struct SettingsView: View {
 
     private var footer: some View {
         HStack {
-            Text("Lumen v\(Self.appVersion)")
+            Text("Peek v\(Self.appVersion)")
                 .font(.system(size: 10.5))
                 .foregroundStyle(.tertiary)
             Spacer()
