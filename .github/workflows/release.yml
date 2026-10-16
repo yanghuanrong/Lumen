@@ -11,6 +11,7 @@ jobs:
     runs-on: macos-latest
     permissions:
       contents: write
+      pull-requests: write
     steps:
       - uses: actions/checkout@v4
 
@@ -69,6 +70,8 @@ jobs:
             --generate-notes
 
       - name: Update README DMG size badge
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           TAG="${GITHUB_REF_NAME}"
           VERSION="${TAG#v}"
@@ -81,9 +84,10 @@ jobs:
           fi
           echo "DMG 体积: ${SIZE}"
 
-          # 切回 main（tag checkout 是 detached HEAD）
+          # main 有分支保护，bot 不能直推；开分支 + PR + 自动合并
+          BRANCH="docs/dmg-badge-${TAG}"
           git fetch origin main
-          git checkout main
+          git checkout -b "${BRANCH}"
           git reset --hard origin/main
 
           # 替换 README 中的 DMG 体积徽章（静态徽章，每次发版刷新）
@@ -97,6 +101,9 @@ jobs:
           if git diff --cached --quiet; then
             echo "README 无变化，跳过提交"
           else
-            git commit -m "docs: 更新 DMG 体积徽章为 ${SIZE} [skip ci]"
-            git push origin main
+            git commit -m "docs: 更新 DMG 体积徽章为 ${SIZE}"
+            git push origin "${BRANCH}"
+            gh pr create --head "${BRANCH}" --title "docs: 更新 DMG 体积徽章为 ${SIZE}" \
+              --body "发版 ${TAG} 自动提交（release workflow）"
+            gh pr merge --auto --squash
           fi

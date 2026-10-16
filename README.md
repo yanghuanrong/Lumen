@@ -5,7 +5,7 @@
 > 📖 一个 macOS 划词翻译小工具
 
 [![Version](https://img.shields.io/github/v/tag/yanghuanrong/Peek?label=version)](https://github.com/yanghuanrong/Peek/releases)
-[![DMG 体积](https://img.shields.io/badge/DMG%E4%BD%93%E7%A7%AF-1.2MB-blue)](https://github.com/yanghuanrong/Peek/releases/latest)
+[![DMG 体积](https://img.shields.io/badge/DMG%E4%BD%93%E7%A7%AF-2.2MB-blue)](https://github.com/yanghuanrong/Peek/releases/latest)
 [![Platform](https://img.shields.io/badge/platform-macOS%2013%2B-lightgrey)](https://github.com/yanghuanrong/Peek)
 [![Downloads](https://img.shields.io/github/downloads/yanghuanrong/Peek/total?label=downloads)](https://github.com/yanghuanrong/Peek/releases)
 
