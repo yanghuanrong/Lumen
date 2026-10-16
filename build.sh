@@ -43,6 +43,16 @@ mkdir -p "${APP_DIR}/Contents/Resources"
 
 cp "${BIN_PATH}/${APP_NAME}" "${APP_DIR}/Contents/MacOS/${APP_NAME}"
 
+# Sparkle 自动更新框架（universal binary，随包分发）
+SPARKLE_FW=".build/artifacts/sparkle/Sparkle/Sparkle.xcframework/macos-arm64_x86_64/Sparkle.framework"
+if [ -d "${SPARKLE_FW}" ]; then
+    mkdir -p "${APP_DIR}/Contents/Frameworks"
+    cp -R "${SPARKLE_FW}" "${APP_DIR}/Contents/Frameworks/"
+else
+    echo "    ⚠️  未找到 Sparkle.framework（swift package resolve 后重试）" >&2
+    exit 1
+fi
+
 # Info.plist
 cat > "${APP_DIR}/Contents/Info.plist" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>
@@ -74,6 +84,11 @@ cat > "${APP_DIR}/Contents/Info.plist" <<PLIST
     <true/>
     <key>NSHumanReadableCopyright</key>
     <string>Lumen · 个人划词翻译工具</string>
+    <!-- Sparkle 自动更新 -->
+    <key>SUFeedURL</key>
+    <string>https://github.com/yanghuanrong/Lumen/releases/latest/download/appcast.xml</string>
+    <key>SUPublicEDKey</key>
+    <string>hAn4vBa2hKgaP1QnQ9r9zWbbdhxurnCQzoAbV/QV+S8=</string>
 </dict>
 </plist>
 PLIST
@@ -158,7 +173,10 @@ else
 fi
 
 echo "==> 签名（ad-hoc）"
-# 全局快捷键（Carbon HotKey）不需要辅助功能授权，但 ad-hoc 签名可保证 Gatekeeper 放行
+# 先签框架再签 App；ad-hoc 签名可保证 Gatekeeper 放行
+codesign --force --sign - --timestamp=none "${APP_DIR}/Contents/Frameworks/Sparkle.framework" 2>/dev/null || {
+    echo "    Sparkle 签名跳过（不影响本机运行）"
+}
 codesign --force --sign - --timestamp=none "${APP_DIR}" 2>/dev/null || {
     echo "    签名跳过（不影响本机运行）"
 }
